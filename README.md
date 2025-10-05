@@ -67,5 +67,5 @@ GET	/api/news?symbol=AAPL	Fetches latest stock-related news
 
 👨‍💻 Author
 
-Name: Obaid Hussain
+Name: Obaid
 GitHub: @obaid1401
