@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import Navbar from "./components/Navbar"
 import StockSelector from "./components/StockSelector"
@@ -12,6 +10,7 @@ import { fetchHistoricalData, fetchForecast } from "./services/api"
 function App() {
   const [selectedStock, setSelectedStock] = useState("AAPL")
   const [forecastSteps, setForecastSteps] = useState(5)
+  const [horizon, setHorizon] = useState("24hrs")
   const [isLoading, setIsLoading] = useState(false)
   const [chartData, setChartData] = useState({ chartData: [], metrics: {} })
   const [error, setError] = useState(null)
@@ -24,7 +23,7 @@ function App() {
     try {
       setIsLoading(true)
       setError(null)
-      const historyData = await fetchHistoricalData(selectedStock)
+      const historyData = await fetchHistoricalData(selectedStock, { limit: 90 })
 
       let historyArray = historyData
       if (historyData && typeof historyData === "object" && !Array.isArray(historyData)) {
@@ -64,7 +63,7 @@ function App() {
       setIsLoading(true)
       setError(null)
 
-      const forecastData = await fetchForecast(selectedStock, forecastSteps)
+      const forecastData = await fetchForecast(selectedStock, forecastSteps, horizon)
 
       setChartData((prev) => {
         const historicalData = [...prev.chartData]
@@ -74,9 +73,23 @@ function App() {
 
           const forecastLength = Math.max(arima?.length || 0, lstm?.length || 0, ensemble?.length || 0)
 
+          // Determine last timestamp from history
+          const lastHist = historicalData.filter((d) => d && d.date).slice(-1)[0]
+          const lastTime = lastHist ? new Date(lastHist.date).getTime() : Date.now()
+
+          const horizonToMs = {
+            "1hr": 60 * 60 * 1000,
+            "3hrs": 3 * 60 * 60 * 1000,
+            "24hrs": 24 * 60 * 60 * 1000,
+            "72hrs": 72 * 60 * 60 * 1000,
+          }
+          const stepMs = horizonToMs[horizon] || 24 * 60 * 60 * 1000
+
           for (let i = 0; i < forecastLength; i++) {
+            const t = new Date(lastTime + stepMs * (i + 1))
+            const iso = t.toISOString()
             historicalData.push({
-              date: `Forecast ${i + 1}`,
+              date: iso,
               open: null,
               high: null,
               low: null,
@@ -119,6 +132,8 @@ function App() {
           <ForecastControls
             forecastSteps={forecastSteps}
             onStepsChange={setForecastSteps}
+            horizon={horizon}
+            onHorizonChange={setHorizon}
             onGetForecast={handleGetForecast}
             isLoading={isLoading}
           />
@@ -126,7 +141,7 @@ function App() {
 
         {/* Chart Section */}
         <div className="mb-8">
-          <CandlestickChart data={chartData} selectedStock={selectedStock} isLoading={isLoading} />
+          <CandlestickChart data={chartData} selectedStock={selectedStock} isLoading={isLoading} horizon={horizon} />
         </div>
 
         {/* Metrics and News Grid */}

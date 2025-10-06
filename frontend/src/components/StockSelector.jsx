@@ -1,13 +1,8 @@
-"use client"
-
 import { ChevronDown } from "lucide-react"
 
 const STOCKS = [
   { value: "AAPL", label: "Apple Inc. (AAPL)" },
   { value: "TSLA", label: "Tesla Inc. (TSLA)" },
-  { value: "GOOGL", label: "Alphabet Inc. (GOOGL)" },
-  { value: "MSFT", label: "Microsoft Corp. (MSFT)" },
-  { value: "AMZN", label: "Amazon.com Inc. (AMZN)" },
   { value: "BTC-USD", label: "Bitcoin USD (BTC-USD)" },
 ]
 

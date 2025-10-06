@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 from services.db import db
 
-def get_stock_data(symbol, period="1mo"):
+def get_stock_data(symbol, period="6mo"):
     """Fetch historical stock/crypto data with indicators and save to MongoDB"""
     data = yf.download(symbol, period=period, interval="1d")
 

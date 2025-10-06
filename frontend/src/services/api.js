@@ -1,9 +1,11 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000"
 
-// Fetch historical OHLC data
-export const fetchHistoricalData = async (symbol) => {
+// historical data
+export const fetchHistoricalData = async (symbol, { limit } = {}) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/history?symbol=${symbol}`)
+    const params = new URLSearchParams({ symbol })
+    if (limit) params.set("limit", String(limit))
+    const response = await fetch(`${API_BASE_URL}/api/history?${params.toString()}`)
 
     if (!response.ok) {
       throw new Error(`Failed to fetch historical data: ${response.statusText}`)
@@ -25,15 +27,15 @@ export const fetchHistoricalData = async (symbol) => {
   }
 }
 
-// Fetch forecast data
-export const fetchForecast = async (symbol, steps) => {
+// forecast data
+export const fetchForecast = async (symbol, steps, horizon) => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/forecast`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ symbol, steps }),
+      body: JSON.stringify({ symbol, steps, horizon }),
     })
 
     if (!response.ok) {
@@ -48,7 +50,7 @@ export const fetchForecast = async (symbol, steps) => {
   }
 }
 
-// Fetch news headlines
+// news headlines
 export const fetchNews = async (symbol) => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/news?symbol=${symbol}`)

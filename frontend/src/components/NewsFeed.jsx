@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { ExternalLink, Newspaper } from "lucide-react"
 import { fetchNews } from "../services/api"
@@ -23,7 +21,7 @@ export default function NewsFeed({ selectedStock }) {
         }
 
         if (Array.isArray(newsArray)) {
-          // ✅ Remove duplicates based on unique URL or headline
+          // Remove duplicates based on unique URL or headline
           const uniqueNews = []
           const seen = new Set()
 
